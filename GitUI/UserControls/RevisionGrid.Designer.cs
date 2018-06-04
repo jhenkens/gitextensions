@@ -112,6 +112,8 @@ namespace GitUI
             this.compareToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compareWithCurrentBranchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compareToBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compareToWorkingDirectoryMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compareSelectedCommitsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectAsBaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.createTagToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -500,13 +502,28 @@ namespace GitUI
             this.selectAsBaseToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.L;
             this.selectAsBaseToolStripMenuItem.Click += new System.EventHandler(this.selectAsBaseToolStripMenuItem_Click);
             // 
-            // selectAsBaseToolStripMenuItem
+            // compareToBaseToolStripMenuItem
             // 
             this.compareToBaseToolStripMenuItem.Name = "compareToBaseToolStripMenuItem";
             this.compareToBaseToolStripMenuItem.Size = new System.Drawing.Size(230, 22);
             this.compareToBaseToolStripMenuItem.Text = "Compare to BASE";
             this.compareToBaseToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.R;
             this.compareToBaseToolStripMenuItem.Click += new System.EventHandler(this.compareToBaseToolStripMenuItem_Click);
+            // 
+            // compareToWorkingDirectoryMenuItem
+            // 
+            this.compareToWorkingDirectoryMenuItem.Name = "compareToWorkingDirectoryMenuItem";
+            this.compareToWorkingDirectoryMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.compareToWorkingDirectoryMenuItem.Text = "Compare to working directory";
+            this.compareToWorkingDirectoryMenuItem.ShortcutKeys = Keys.Control | Keys.D;
+            this.compareToWorkingDirectoryMenuItem.Click += new System.EventHandler(this.compareToWorkingDirectoryMenuItem_Click);
+            // 
+            // compareSelectedCommitsMenuItem
+            // 
+            this.compareSelectedCommitsMenuItem.Name = "compareSelectedCommitsMenuItem";
+            this.compareSelectedCommitsMenuItem.Size = new System.Drawing.Size(230, 22);
+            this.compareSelectedCommitsMenuItem.Text = "Compare selected commits";
+            this.compareSelectedCommitsMenuItem.Click += new System.EventHandler(this.compareSelectedCommitsMenuItem_Click);
             // 
             // compareToolStripMenuItem
             // 
@@ -519,6 +536,8 @@ namespace GitUI
                 compareWithCurrentBranchToolStripMenuItem,
                 selectAsBaseToolStripMenuItem,
                 compareToBaseToolStripMenuItem,
+                compareToWorkingDirectoryMenuItem,
+                compareSelectedCommitsMenuItem,
             });
             // 
             // toolStripSeparator5
@@ -898,6 +917,8 @@ namespace GitUI
         private System.Windows.Forms.ToolStripMenuItem compareToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem compareWithCurrentBranchToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem compareToBaseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem compareToWorkingDirectoryMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem compareSelectedCommitsMenuItem;
         private System.Windows.Forms.ToolStripMenuItem selectAsBaseToolStripMenuItem;
         private ToolStripMenuItem getHelpOnHowToUseTheseFeaturesToolStripMenuItem;
         private ToolStripMenuItem openBuildReportToolStripMenuItem;

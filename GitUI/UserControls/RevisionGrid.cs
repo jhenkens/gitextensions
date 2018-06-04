@@ -845,8 +845,14 @@ namespace GitUI
 
             var selectedRevisions = GetSelectedRevisions();
             var firstSelectedRevision = selectedRevisions.FirstOrDefault();
+            var secondSelectedRevision = selectedRevisions.Skip(1).FirstOrDefault();
             if (selectedRevisions.Count == 1 && firstSelectedRevision != null)
+            {
                 _navigationHistory.Push(firstSelectedRevision.Guid);
+                compareToWorkingDirectoryMenuItem.Enabled = firstSelectedRevision.Guid != GitRevision.UnstagedGuid;
+            }
+
+            compareSelectedCommitsMenuItem.Enabled = selectedRevisions.Count == 2 && firstSelectedRevision != null && secondSelectedRevision != null;
 
             if (this.Parent != null && !Revisions.UpdatingVisibleRows &&
                 _revisionHighlighting.ProcessRevisionSelectionChange(Module, selectedRevisions) ==
@@ -3408,11 +3414,8 @@ namespace GitUI
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     var baseCommit = Module.RevParse(form.BranchName);
-                    using (var diffForm = new FormDiff(UICommands, this, baseCommit, headCommit.Guid,
-                        form.BranchName, headCommit.Subject))
-                    {
-                        diffForm.ShowDialog(this);
-                    }
+                    PerformDiff(baseCommit, headCommit.Guid,
+                        form.BranchName, headCommit.Subject);
                 }
             }
         }
@@ -3422,11 +3425,8 @@ namespace GitUI
             var baseCommit = this.GetSelectedRevisions().First();
             var headBranch = Module.GetSelectedBranch();
             var headBranchName = Module.RevParse(headBranch);
-            using (var diffForm = new FormDiff(UICommands, this, baseCommit.Guid, headBranchName,
-                baseCommit.Subject, headBranch))
-            {
-                diffForm.ShowDialog(this);
-            }
+            PerformDiff( baseCommit.Guid, headBranchName,
+                baseCommit.Subject, headBranch);
         }
 
         private void selectAsBaseToolStripMenuItem_Click(object sender, EventArgs e)
@@ -3444,10 +3444,48 @@ namespace GitUI
             }
 
             var headCommit = GetSelectedRevisions().First();
-            using (var diffForm = new FormDiff(UICommands, this, _baseCommitToCompare.Guid, headCommit.Guid,
-                _baseCommitToCompare.Subject, headCommit.Subject))
+            PerformDiff( _baseCommitToCompare.Guid, headCommit.Guid,
+                _baseCommitToCompare.Subject, headCommit.Subject);
+        }
+
+        private void compareToWorkingDirectoryMenuItem_Click(object sender, EventArgs e)
+        {
+            var baseCommit = GetSelectedRevisions().First();
+            if (baseCommit.Guid == GitRevision.UnstagedGuid)
             {
-                diffForm.ShowDialog(this);
+                MessageBox.Show(this, "Cannot diff working directory to itself");
+                return;
+            }
+
+            PerformDiff(baseCommit.Guid, GitRevision.UnstagedGuid,
+                baseCommit.Subject, "Working directory");
+        }
+
+        private void compareSelectedCommitsMenuItem_Click(object sender, EventArgs e)
+        {
+            var revisions = GetSelectedRevisions();
+            var headCommit = revisions.First();
+            var baseCommit = revisions.Skip(1)
+                .First();
+
+            PerformDiff(baseCommit.Guid, headCommit.Guid,
+                baseCommit.Subject, headCommit.Subject);
+        }
+
+        private void PerformDiff(string baseCommitSha, string headCommitSha, string baseCommitDisplayStr, string headCommitDisplayStr)
+        {
+            if (AppSettings.UseDifftoolDirDiff)
+            {
+                UICommands.Module.OpenWithDifftoolDirDiff(baseCommitSha, headCommitSha);
+            }
+            else
+            {
+                using (var diffForm = new FormDiff(UICommands, this, baseCommitSha, headCommitSha,
+                    baseCommitDisplayStr, headCommitDisplayStr))
+                {
+                    diffForm.ShowDialog(this);
+                }
+
             }
         }
 

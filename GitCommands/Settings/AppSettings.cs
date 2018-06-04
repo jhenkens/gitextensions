@@ -578,6 +578,12 @@ namespace GitCommands
             set { SetBool("LoadBlameOnShow", value); }
         }
 
+        public static bool UseDifftoolDirDiff
+        {
+            get => GetBool("usedifftooldirdiff", false);
+            set => SetBool("usedifftooldirdiff", value);
+        }
+
         public static bool OpenSubmoduleDiffInSeparateWindow
         {
             get { return GetBool("opensubmodulediffinseparatewindow", false); }
