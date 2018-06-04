@@ -1122,6 +1122,19 @@ namespace GitUI
             }
         }
 
+        public void PerformDiff(bool firstParentIsValid, ObjectId baseCommitSha,
+            ObjectId headCommitSha, string baseCommitDisplayStr, string headCommitDisplayStr)
+        {
+            if (AppSettings.UseDifftoolDirDiff)
+            {
+                Module.OpenWithDifftoolDirDiff(baseCommitSha.ToString(), headCommitSha.ToString());
+            }
+            else
+            {
+                ShowFormDiff(firstParentIsValid, baseCommitSha, headCommitSha, baseCommitDisplayStr, headCommitDisplayStr);
+            }
+        }
+
         public FormDiff ShowFormDiff(bool firstParentIsValid, ObjectId baseCommitSha,
             ObjectId headCommitSha, string baseCommitDisplayStr, string headCommitDisplayStr)
         {

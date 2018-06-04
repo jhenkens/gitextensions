@@ -991,10 +991,14 @@ namespace GitUI
 
             var selectedRevisions = GetSelectedRevisions();
             var firstSelectedRevision = selectedRevisions.FirstOrDefault();
+            var secondSelectedRevision = selectedRevisions.Skip(1).FirstOrDefault();
             if (selectedRevisions.Count == 1 && firstSelectedRevision != null)
             {
                 _navigationHistory.Push(firstSelectedRevision.Guid);
+                compareToWorkingDirectoryMenuItem.Enabled = firstSelectedRevision.ObjectId != ObjectId.UnstagedId;
             }
+
+            compareSelectedCommitsMenuItem.Enabled = selectedRevisions.Count == 2 && firstSelectedRevision != null && secondSelectedRevision != null;
 
             if (Parent != null && !Revisions.UpdatingVisibleRows &&
                 _revisionHighlighting.ProcessRevisionSelectionChange(Module, selectedRevisions) ==
@@ -3736,7 +3740,7 @@ namespace GitUI
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     var baseCommit = Module.RevParse(form.BranchName);
-                    UICommands.ShowFormDiff(IsFirstParentValid(), baseCommit, headCommit.ObjectId,
+                    UICommands.PerformDiff(IsFirstParentValid(), baseCommit, headCommit.ObjectId,
                         form.BranchName, headCommit.Subject);
                 }
             }
@@ -3747,7 +3751,7 @@ namespace GitUI
             var baseCommit = GetSelectedRevisions().First();
             var headBranch = Module.GetSelectedBranch();
             var headBranchName = Module.RevParse(headBranch);
-            UICommands.ShowFormDiff(IsFirstParentValid(), baseCommit.ObjectId, headBranchName,
+            UICommands.PerformDiff(IsFirstParentValid(), baseCommit.ObjectId, headBranchName,
                 baseCommit.Subject, headBranch);
         }
 
@@ -3766,8 +3770,32 @@ namespace GitUI
             }
 
             var headCommit = GetSelectedRevisions().First();
-            UICommands.ShowFormDiff(IsFirstParentValid(), _baseCommitToCompare.ObjectId, headCommit.ObjectId,
+            UICommands.PerformDiff(IsFirstParentValid(), _baseCommitToCompare.ObjectId, headCommit.ObjectId,
                 _baseCommitToCompare.Subject, headCommit.Subject);
+        }
+
+        private void compareToWorkingDirectoryMenuItem_Click(object sender, EventArgs e)
+        {
+            var baseCommit = GetSelectedRevisions().First();
+            if (baseCommit.ObjectId == ObjectId.UnstagedId)
+            {
+                MessageBox.Show(this, "Cannot diff working directory to itself");
+                return;
+            }
+
+            UICommands.PerformDiff(IsFirstParentValid(), baseCommit.ObjectId, ObjectId.UnstagedId,
+                baseCommit.Subject, "Working directory");
+        }
+
+        private void compareSelectedCommitsMenuItem_Click(object sender, EventArgs e)
+        {
+            var revisions = GetSelectedRevisions();
+            var headCommit = revisions.First();
+            var baseCommit = revisions.Skip(1)
+                .First();
+
+            UICommands.PerformDiff(IsFirstParentValid(), baseCommit.ObjectId, headCommit.ObjectId,
+                baseCommit.Subject, headCommit.Subject);
         }
 
         private void getHelpOnHowToUseTheseFeaturesToolStripMenuItem_Click(object sender, EventArgs e)

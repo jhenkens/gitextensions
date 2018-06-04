@@ -598,6 +598,12 @@ namespace GitCommands
             set => SetBool("IgnoreWhitespaceOnBlame", value);
         }
 
+        public static bool UseDifftoolDirDiff
+        {
+            get => GetBool("usedifftooldirdiff", false);
+            set => SetBool("usedifftooldirdiff", value);
+        }
+
         public static bool OpenSubmoduleDiffInSeparateWindow
         {
             get => GetBool("opensubmodulediffinseparatewindow", false);

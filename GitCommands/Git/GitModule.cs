@@ -3429,6 +3429,15 @@ namespace GitCommands
                 });
         }
 
+        // Known bug on git-for-windows: Comparing working directory to any branch, fails, due to -R
+        // I.e., git difftool --gui --no-prompt --dir-diff -R HEAD fails, but
+        // git difftool --gui --no-prompt --dir-diff HEAD succeeds
+        public string OpenWithDifftoolDirDiff(string firstRevision = GitRevision.IndexGuid, string secondRevision = GitRevision.UnstagedGuid, string extraDiffArguments = null)
+        {
+            extraDiffArguments = ((extraDiffArguments ?? "") + " --dir-diff").Trim();
+            return OpenWithDifftool(null, null, firstRevision: firstRevision, secondRevision: secondRevision, extraDiffArguments: extraDiffArguments);
+        }
+
         public string OpenWithDifftool(string filename, string oldFileName = "", string firstRevision = GitRevision.IndexGuid, string secondRevision = GitRevision.UnstagedGuid, string extraDiffArguments = null, bool isTracked = true)
         {
             var args = new ArgumentBuilder
