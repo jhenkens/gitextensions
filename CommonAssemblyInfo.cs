@@ -19,6 +19,6 @@
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("2.51.02")]
-[assembly: AssemblyFileVersion("2.51.02")]
-[assembly: AssemblyInformationalVersion("2.51.02")]
+[assembly: AssemblyVersion("2.51.1337")]
+[assembly: AssemblyFileVersion("2.51.1337")]
+[assembly: AssemblyInformationalVersion("2.51.1337")]

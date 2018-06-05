@@ -11,7 +11,7 @@ set EnableNuGetPackageRestore=true
 ..\.nuget\nuget.exe restore %project%
 set msbuildparams=/p:Configuration=Release /t:Rebuild /nologo /v:m
 
-%msbuild% %project% /p:Platform="Any CPU" %msbuildparams%
+msbuild %project% /p:Platform="Any CPU" %msbuildparams%
 IF ERRORLEVEL 1 EXIT /B 1
 
 Echo ----------------------------------------------------------------------
@@ -25,7 +25,7 @@ Echo ----------------------------------------------------------------------
 call MakeInstallers.cmd
 IF ERRORLEVEL 1 EXIT /B 1
 
-%msbuild% %project% /p:Platform="Any CPU" /p:DefineConstants=__MonoCS__ %msbuildparams%
+msbuild %project% /p:Platform="Any CPU" /p:DefineConstants=__MonoCS__ %msbuildparams%
 IF ERRORLEVEL 1 EXIT /B 1
 
 Echo ----------------------------------------------------------------------
