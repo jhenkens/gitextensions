@@ -998,7 +998,18 @@ namespace GitUI
                 compareToWorkingDirectoryMenuItem.Enabled = firstSelectedRevision.ObjectId != ObjectId.UnstagedId;
             }
 
-            compareSelectedCommitsMenuItem.Enabled = selectedRevisions.Count == 2 && firstSelectedRevision != null && secondSelectedRevision != null;
+            // Bug in git-for-windows: Comparing working directory to any branch, fails, due to -R
+            // I.e., git difftool --gui --no-prompt --dir-diff -R HEAD fails, but
+            // git difftool --gui --no-prompt --dir-diff HEAD succeeds
+            // Thus, we disable comparing "from" working directory.
+            var enabledDiffOnWorkingDirectory = !(AppSettings.UseDifftoolDirDiff && firstSelectedRevision?.Guid == GitRevision.UnstagedGuid);
+
+            compareSelectedCommitsMenuItem.Enabled = selectedRevisions.Count == 2 && firstSelectedRevision != null && secondSelectedRevision != null && enabledDiffOnWorkingDirectory;
+
+            compareToBranchToolStripMenuItem.Enabled = enabledDiffOnWorkingDirectory;
+            compareWithCurrentBranchToolStripMenuItem.Enabled = enabledDiffOnWorkingDirectory;
+            compareSelectedCommitsMenuItem.Enabled = enabledDiffOnWorkingDirectory;
+            selectAsBaseToolStripMenuItem.Enabled = enabledDiffOnWorkingDirectory;
 
             if (Parent != null && !Revisions.UpdatingVisibleRows &&
                 _revisionHighlighting.ProcessRevisionSelectionChange(Module, selectedRevisions) ==
