@@ -84,7 +84,7 @@
             this.chkShowDiffForAllParents.Name = "chkShowDiffForAllParents";
             this.chkShowDiffForAllParents.Size = new System.Drawing.Size(280, 17);
             this.chkShowDiffForAllParents.TabIndex = 10;
-            this.chkShowDiffForAllParents.Text = "Show file differences for all parents in browse dialog.";
+            this.chkShowDiffForAllParents.Text = "Show file differences for all parents in browse dialog";
             this.chkShowDiffForAllParents.UseVisualStyleBackColor = true;
             // 
             // useDifftoolDirDiff
@@ -94,7 +94,7 @@
             this.useDifftoolDirDiff.Name = "useDifftoolDirDiff";
             this.useDifftoolDirDiff.Size = new System.Drawing.Size(223, 17);
             this.useDifftoolDirDiff.TabIndex = 9;
-            this.useDifftoolDirDiff.Text = "Use diff-tool dir diff instead of builtin.";
+            this.useDifftoolDirDiff.Text = "Use diff-tool dir diff instead of builtin";
             this.useDifftoolDirDiff.UseVisualStyleBackColor = true;
             // 
             // chkOpenSubmoduleDiffInSeparateWindow
