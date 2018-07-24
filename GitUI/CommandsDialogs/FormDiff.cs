@@ -58,9 +58,12 @@ namespace GitUI.CommandsDialogs
 
             _baseRevision = new GitRevision(baseId);
             _headRevision = new GitRevision(headId);
-            _mergeBase = new GitRevision(Module.GetMergeBase(_baseRevision.Guid, _headRevision.Guid));
+
+            var mergeBase = Module.GetMergeBase(_baseRevision.Guid, _headRevision.Guid);
+            _mergeBase = mergeBase != null ? new GitRevision(mergeBase) : null;
             ckCompareToMergeBase.Text += $" ({_mergeBase?.ObjectId.ToShortString()})";
-            ckCompareToMergeBase.Enabled = _mergeBase?.ObjectId != null;
+            ckCompareToMergeBase.Enabled = _mergeBase != null;
+
             _fullPathResolver = new FullPathResolver(() => Module.WorkingDir);
             _findFilePredicateProvider = new FindFilePredicateProvider();
             _revisionTester = new GitRevisionTester(_fullPathResolver);
