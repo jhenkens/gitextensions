@@ -59,7 +59,7 @@ namespace GitUI.CommandsDialogs
             _baseRevision = new GitRevision(baseId);
             _headRevision = new GitRevision(headId);
 
-            var mergeBase = Module.GetMergeBase(_baseRevision.Guid, _headRevision.Guid);
+            var mergeBase = Module.GetMergeBase(_baseRevision.ObjectId, _headRevision.ObjectId);
             _mergeBase = mergeBase != null ? new GitRevision(mergeBase) : null;
             setCkCompareToMergeBaseText(_mergeBase?.ObjectId.ToShortString());
             ckCompareToMergeBase.Enabled = _mergeBase != null;
