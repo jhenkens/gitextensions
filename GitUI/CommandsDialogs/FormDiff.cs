@@ -237,7 +237,7 @@ namespace GitUI.CommandsDialogs
 
         private void btnCompareDirectoriesWithDiffTool_Clicked(object sender, EventArgs e)
         {
-            Module.OpenWithDifftoolDirDiff(_baseRevision.Guid, _headRevision.Guid);
+            Module.OpenWithDifftoolDirDiff((ckCompareToMergeBase.Checked ? _mergeBase : _baseRevision).Guid, _headRevision.Guid);
         }
 
         private void btnPickAnotherBranch_Click(object sender, EventArgs e)
