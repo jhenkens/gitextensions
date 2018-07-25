@@ -61,7 +61,7 @@ namespace GitUI.CommandsDialogs
 
             var mergeBase = Module.GetMergeBase(_baseRevision.Guid, _headRevision.Guid);
             _mergeBase = mergeBase != null ? new GitRevision(mergeBase) : null;
-            ckCompareToMergeBase.Text += $" ({_mergeBase?.ObjectId.ToShortString()})";
+            setCkCompareToMergeBaseText(_mergeBase?.ObjectId.ToShortString());
             ckCompareToMergeBase.Enabled = _mergeBase != null;
 
             _fullPathResolver = new FullPathResolver(() => Module.WorkingDir);
@@ -86,6 +86,13 @@ namespace GitUI.CommandsDialogs
             DiffFiles.SetDiffs(ckCompareToMergeBase.Checked
                 ? new[] { _headRevision, _mergeBase }
                 : new[] { _headRevision, _baseRevision });
+
+            // Bug in git-for-windows: Comparing working directory to any branch, fails, due to -R
+            // I.e., git difftool --gui --no-prompt --dir-diff -R HEAD fails, but
+            // git difftool --gui --no-prompt --dir-diff HEAD succeeds
+            // Thus, we disable comparing "from" working directory.
+            var enableDifftoolDirDiff = _headRevision?.Guid != GitRevision.UnstagedGuid;
+            openWithDifftoolToolStripMenuItem.Enabled = enableDifftoolDirDiff;
         }
 
         private void ShowSelectedFileDiff()
@@ -221,6 +228,16 @@ namespace GitUI.CommandsDialogs
         private void ckCompareToMergeBase_CheckedChanged(object sender, EventArgs e)
         {
             PopulateDiffFiles();
+        }
+
+        private void setCkCompareToMergeBaseText(string commit)
+        {
+            ckCompareToMergeBase.Text = $"Compare to merge &base ({commit})";
+        }
+
+        private void btnCompareDirectoriesWithDiffTool_Clicked(object sender, EventArgs e)
+        {
+            Module.OpenWithDifftoolDirDiff(_baseRevision.Guid, _headRevision.Guid);
         }
 
         private void btnPickAnotherBranch_Click(object sender, EventArgs e)

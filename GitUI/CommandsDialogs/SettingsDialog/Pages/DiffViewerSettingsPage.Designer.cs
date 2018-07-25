@@ -31,7 +31,6 @@
             this.components = new System.ComponentModel.Container();
             this.tableLayoutPanelForDiffViewer = new System.Windows.Forms.TableLayoutPanel();
             this.chkShowDiffForAllParents = new System.Windows.Forms.CheckBox();
-            this.useDifftoolDirDiff = new System.Windows.Forms.CheckBox();
             this.chkOpenSubmoduleDiffInSeparateWindow = new System.Windows.Forms.CheckBox();
             this.chkRememberIgnoreWhiteSpacePreference = new System.Windows.Forms.CheckBox();
             this.chkRememberShowNonPrintingCharsPreference = new System.Windows.Forms.CheckBox();
@@ -52,7 +51,6 @@
             this.tableLayoutPanelForDiffViewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanelForDiffViewer.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanelForDiffViewer.Controls.Add(this.chkShowDiffForAllParents, 0, 6);
-            this.tableLayoutPanelForDiffViewer.Controls.Add(this.useDifftoolDirDiff, 0, 8);
             this.tableLayoutPanelForDiffViewer.Controls.Add(this.chkOpenSubmoduleDiffInSeparateWindow, 0, 5);
             this.tableLayoutPanelForDiffViewer.Controls.Add(this.chkRememberIgnoreWhiteSpacePreference, 0, 0);
             this.tableLayoutPanelForDiffViewer.Controls.Add(this.chkRememberShowNonPrintingCharsPreference, 0, 1);
@@ -86,16 +84,6 @@
             this.chkShowDiffForAllParents.TabIndex = 10;
             this.chkShowDiffForAllParents.Text = "Show file differences for all parents in browse dialog";
             this.chkShowDiffForAllParents.UseVisualStyleBackColor = true;
-            // 
-            // useDifftoolDirDiff
-            // 
-            this.useDifftoolDirDiff.AutoSize = true;
-            this.useDifftoolDirDiff.Location = new System.Drawing.Point(3, 164);
-            this.useDifftoolDirDiff.Name = "useDifftoolDirDiff";
-            this.useDifftoolDirDiff.Size = new System.Drawing.Size(223, 17);
-            this.useDifftoolDirDiff.TabIndex = 9;
-            this.useDifftoolDirDiff.Text = "Use diff-tool dir diff instead of builtin";
-            this.useDifftoolDirDiff.UseVisualStyleBackColor = true;
             // 
             // chkOpenSubmoduleDiffInSeparateWindow
             // 
@@ -213,7 +201,6 @@
         private System.Windows.Forms.CheckBox chkRememberNumberOfContextLines;
         private System.Windows.Forms.CheckBox chkOmitUninterestingDiff;
         private System.Windows.Forms.ToolTip tooltip;
-        private System.Windows.Forms.CheckBox useDifftoolDirDiff;
         private System.Windows.Forms.CheckBox chkOpenSubmoduleDiffInSeparateWindow;
         private System.Windows.Forms.CheckBox chkShowDiffForAllParents;
         private System.Windows.Forms.NumericUpDown VerticalRulerPosition;

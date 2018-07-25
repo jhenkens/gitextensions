@@ -186,8 +186,6 @@ namespace GitUI
             _gridView.AddColumn(new DateColumnProvider(this));
             _gridView.AddColumn(new CommitIdColumnProvider(this));
             _gridView.AddColumn(_buildServerWatcher.ColumnProvider);
-
-            fixupCommitToolStripMenuItem.ShortcutKeyDisplayString = GetShortcutKeys(Commands.CreateFixupCommit).ToShortcutKeyDisplayString();
         }
 
         protected override void Dispose(bool disposing)
@@ -1135,25 +1133,16 @@ namespace GitUI
 
             var selectedRevisions = GetSelectedRevisions();
             var firstSelectedRevision = selectedRevisions.FirstOrDefault();
+            var secondSelectedRevision = selectedRevisions.Skip(1).FirstOrDefault();
 
             if (selectedRevisions.Count == 1 && firstSelectedRevision != null)
             {
                 _navigationHistory.Push(firstSelectedRevision.ObjectId);
             }
 
-            var secondSelectedRevision = selectedRevisions.Skip(1).FirstOrDefault();
             compareToWorkingDirectoryMenuItem.Enabled = firstSelectedRevision != null && firstSelectedRevision.ObjectId != ObjectId.UnstagedId;
-
-            // Bug in git-for-windows: Comparing working directory to any branch, fails, due to -R
-            // I.e., git difftool --gui --no-prompt --dir-diff -R HEAD fails, but
-            // git difftool --gui --no-prompt --dir-diff HEAD succeeds
-            // Thus, we disable comparing "from" working directory.
-            var enabledDiffOnWorkingDirectory = !AppSettings.UseDifftoolDirDiff || firstSelectedRevision?.Guid != GitRevision.UnstagedGuid;
-            compareSelectedCommitsMenuItem.Enabled = firstSelectedRevision != null && secondSelectedRevision != null && enabledDiffOnWorkingDirectory;
-
-            compareToBranchToolStripMenuItem.Enabled = enabledDiffOnWorkingDirectory;
-            compareWithCurrentBranchToolStripMenuItem.Enabled = enabledDiffOnWorkingDirectory && Module.GetSelectedBranch().IsNotNullOrWhitespace();
-            selectAsBaseToolStripMenuItem.Enabled = enabledDiffOnWorkingDirectory;
+            compareWithCurrentBranchToolStripMenuItem.Enabled = Module.GetSelectedBranch().IsNotNullOrWhitespace();
+            compareSelectedCommitsMenuItem.Enabled = firstSelectedRevision != null && secondSelectedRevision != null;
 
             if (Parent != null &&
                 !_gridView.UpdatingVisibleRows &&
@@ -2180,6 +2169,21 @@ namespace GitUI
             }
         }
 
+        internal void SetShortcutKeys()
+        {
+            SetShortcutString(fixupCommitToolStripMenuItem, Commands.CreateFixupCommit);
+            SetShortcutString(selectAsBaseToolStripMenuItem, Commands.SelectAsBaseToCompare);
+            SetShortcutString(compareToBaseToolStripMenuItem, Commands.CompareToBase);
+            SetShortcutString(compareToWorkingDirectoryMenuItem, Commands.CompareToWorkingDirectory);
+            SetShortcutString(compareSelectedCommitsMenuItem, Commands.CompareSelectedCommits);
+        }
+
+        private void SetShortcutString(ToolStripMenuItem item, Commands command)
+        {
+            item.ShortcutKeyDisplayString = GetShortcutKeys(command)
+                .ToShortcutKeyDisplayString();
+        }
+
         internal Keys GetShortcutKeys(Commands cmd)
         {
             return GetShortcutKeys((int)cmd);
@@ -2193,7 +2197,7 @@ namespace GitUI
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     var baseCommit = Module.RevParse(form.BranchName);
-                    UICommands.PerformDiff(IsFirstParentValid(), baseCommit, headCommit.ObjectId,
+                    UICommands.ShowFormDiff(IsFirstParentValid(), baseCommit, headCommit.ObjectId,
                         form.BranchName, headCommit.Subject);
                 }
             }
@@ -2201,11 +2205,16 @@ namespace GitUI
 
         private void CompareWithCurrentBranchToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var baseCommit = GetSelectedRevisions().First();
             var headBranch = Module.GetSelectedBranch();
+            if (headBranch.IsNullOrWhiteSpace())
+            {
+                MessageBox.Show(this, "No branch is currently selected");
+                return;
+            }
+
+            var baseCommit = GetSelectedRevisions().First();
             var headBranchName = Module.RevParse(headBranch);
-            UICommands.PerformDiff(IsFirstParentValid(), baseCommit.ObjectId, headBranchName,
-                baseCommit.Subject, headBranch);
+            UICommands.ShowFormDiff(IsFirstParentValid(), baseCommit.ObjectId, headBranchName, baseCommit.Subject, headBranch);
         }
 
         private void selectAsBaseToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2223,8 +2232,7 @@ namespace GitUI
             }
 
             var headCommit = GetSelectedRevisions().First();
-            UICommands.PerformDiff(IsFirstParentValid(), _baseCommitToCompare.ObjectId, headCommit.ObjectId,
-                _baseCommitToCompare.Subject, headCommit.Subject);
+            UICommands.ShowFormDiff(IsFirstParentValid(), _baseCommitToCompare.ObjectId, headCommit.ObjectId, _baseCommitToCompare.Subject, headCommit.Subject);
         }
 
         private void compareToWorkingDirectoryMenuItem_Click(object sender, EventArgs e)
@@ -2236,19 +2244,22 @@ namespace GitUI
                 return;
             }
 
-            UICommands.PerformDiff(IsFirstParentValid(), baseCommit.ObjectId, ObjectId.UnstagedId,
-                baseCommit.Subject, "Working directory");
+            UICommands.ShowFormDiff(IsFirstParentValid(), baseCommit.ObjectId, ObjectId.UnstagedId, baseCommit.Subject, "Working directory");
         }
 
         private void compareSelectedCommitsMenuItem_Click(object sender, EventArgs e)
         {
             var revisions = GetSelectedRevisions();
-            var headCommit = revisions.First();
+            var headCommit = revisions.FirstOrDefault();
             var baseCommit = revisions.Skip(1)
-                .First();
+                .FirstOrDefault();
+            if (headCommit == null || baseCommit == null)
+            {
+                MessageBox.Show(this, "You must have two commits selected to compare");
+                return;
+            }
 
-            UICommands.PerformDiff(IsFirstParentValid(), baseCommit.ObjectId, headCommit.ObjectId,
-                baseCommit.Subject, headCommit.Subject);
+            UICommands.ShowFormDiff(IsFirstParentValid(), baseCommit.ObjectId, headCommit.ObjectId, baseCommit.Subject, headCommit.Subject);
         }
 
         private void getHelpOnHowToUseTheseFeaturesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2459,7 +2470,11 @@ namespace GitUI
             SelectAsBaseToCompare = 23,
             CompareToBase = 24,
             CreateFixupCommit = 25,
-            ToggleShowTags = 26
+            ToggleShowTags = 26,
+            CompareToWorkingDirectory = 27,
+            CompareToCurrentBranch = 28,
+            CompareToBranch = 29,
+            CompareSelectedCommits = 30,
         }
 
         protected override bool ExecuteCommand(int cmd)
@@ -2492,12 +2507,16 @@ namespace GitUI
                 case Commands.SelectAsBaseToCompare: selectAsBaseToolStripMenuItem_Click(null, null); break;
                 case Commands.CompareToBase: compareToBaseToolStripMenuItem_Click(null, null); break;
                 case Commands.CreateFixupCommit: FixupCommitToolStripMenuItemClick(null, null); break;
+                case Commands.CompareToWorkingDirectory: compareToWorkingDirectoryMenuItem_Click(null, null); break;
+                case Commands.CompareToCurrentBranch: CompareWithCurrentBranchToolStripMenuItem_Click(null, null); break;
+                case Commands.CompareToBranch: CompareToBranchToolStripMenuItem_Click(null, null); break;
+                case Commands.CompareSelectedCommits: compareSelectedCommitsMenuItem_Click(null, null); break;
                 default:
-                {
-                    bool result = base.ExecuteCommand(cmd);
-                    RefreshRevisions();
-                    return result;
-                }
+                    {
+                        bool result = base.ExecuteCommand(cmd);
+                        RefreshRevisions();
+                        return result;
+                    }
             }
 
             return true;
